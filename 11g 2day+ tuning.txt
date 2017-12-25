@@ -1,0 +1,90 @@
+Oracle Database Tuning Pack
+Oracle Database Tuning Pack automates the database application tuning process,thereby significantly lowering database management costs while enhancing
+performance and reliability. Key features of Oracle Database Tuning Pack that are used in this guide include the following:
+– SQL Tuning Advisor
+This feature enables you to submit one or more SQL statements as input and receive output in the form of specific advice or recommendations for how to
+tune statements, along with a rationale for each recommendation and its expected benefit. A recommendation relates to collection of statistics on
+objects, creation of new indexes, restructuring of the SQL statements, or creation of SQL profiles.
+– SQL Access Advisor
+This feature enables you to optimize data access paths of SQL queries by recommending the proper set of materialized views and view logs, indexes,
+and partitions for a given SQL workload.
+
+Oracle Real Application Testing
+Oracle Real Application Testing consists of the following key features:
+– Database Replay
+This feature enables you to capture the database workload on a production system, and replay it on a test system with the exact same timing and
+concurrency as the production system on the same or newer release of Oracle Database.
+– SQL Performance Analyzer
+This feature enables you to assess the effect of system changes on SQL performance by identifying SQL statements that have regressed, improved, or
+remained unchanged
+
+Removing the first bottleneck (a point where resource contention is highest) may not lead to performance improvement immediately because another bottleneck might be revealed that has an even greater
+performance impact on the system. For this reason, the Oracle performance method is iterative. Accurately diagnosing the performance problem is the first step toward
+ensuring that your changes improve performance.Typically, performance problems result from a lack of throughput (the amount of work that can be completed in a specified time), unacceptable user or job response time (the
+time to complete a specified workload), or both.
+
+Automatic Database Diagnostic Monitor (ADDM)implements the Oracle performance method and analyzes statistics to provide automatic diagnosis of major performance problems. Because ADDM can significantly
+shorten the time required to improve the performance of a system, it is the method used in this guide.  Automatic Workload Repository (AWR) automates database statistics Gathering Database Statistics Using the Automatic Workload Repository
+2-2 Oracle Database 2 Day + Performance Tuning Guide gathering by collecting, processing, and maintaining performance statistics for
+database problem detection and self-tuning purposes.  AWR snapshot everyhour.  It is enabled by setting STATISTICS_LEVEL to Typical.
+Ensure that the CONTROL_MANAGEMENT_PACK_ACCESS initialization parameter is set to DIAGNOSTIC+TUNING (default) or DIAGNOSTIC to enable ADDM.
+
+Time Model Statistics
+Time model statistics measure the time spent in the database by operation type. The most important time model statistic is database time (DB time). Database time
+represents the total time spent in database calls by foreground sessions, and is an indicator of the total instance workload.
+DB time includes only time spent on client processes and does not include time spent on background processes such as PMON.
+PMON normally wakes up every 3 seconds to perform its housekeeping activities.
+
+The Active Session History (ASH) statistics are samples of session activity in the database. The database samples active sessions every second and stores them in a
+circular buffer in the System Global Area (SGA).
+
+
+High load sql - V$SQL view.
+
+SQL_TRACE - TKPROF - Execution elapsed time (exeela).
+
+In the proactive tuning phase, you must perform tuning tasks as part of your daily database maintenance routine, such as reviewing ADDM analysis and findings,
+monitoring the real-time performance of the database, and responding to alerts.
+
+Review the ADDM findings
+Implement the ADDM recommendations
+Monitor performance problems with the database in real time
+Respond to performance-related alerts
+Validate that any changes made have produced the desired effect
+
+In the reactive tuning phase, you must respond to issues reported by users, such as performance problems that may occur for only a short duration of time, or
+performance degradation to the database over a period of time.
+Run ADDM manually to diagnose current and historical database performance when performance problems are reported by the users
+Resolve transient performance problems
+Resolve performance degradation over time
+Validate that the changes made have produced the desired effect
+Repeat these steps until your performance goals are met or become impossible to achieve due to other constraints.
+
+
+To tune SQL statements:
+1. Identify & Tune high-load SQL statements
+2. Optimize data access paths
+3. Analyze the SQL performance impact
+
+
+CPU bottlenecks
+Undersized memory structures (system global area and pga).
+I/O capacity issues
+Suboptimal use of Oracle Database by the application - Problems such as establishing new database connections repeatedly, excessive SQL parsing, and
+high levels of contention for a small amount of data
+Concurrency issues - A high degree of concurrent activities might result in contention for shared resources that can manifest in the forms of locks or waits for
+buffer cache.
+Database configuration issues - For example, is there evidence of incorrect sizing of log files, archiving issues, too
+many checkpoints, or suboptimal parameter settings?
+Short-lived performance problems - Depending on the interval between snapshots taken by AWR
+Degradation of database performance over time - You can generate an AWR Compare Periods report 
+Inefficient or high-load SQL statements - Performance problems caused by high-load SQL statements are diagnosed by ADDM
+Object contention - Are any database objects the source of bottlenecks because they are continuously accessed
+Unexpected performance regression after tuning SQL statements - page 28.
+Measuring the performance before and after the change
+■ Generating a report that describes the change in performance
+■ Identifying the SQL statements that regressed or improved
+■ Providing tuning recommendations for each SQL statement that regressed
+■ Enabling you to implement the tuning recommendations when appropriate
+
+
