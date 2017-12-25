@@ -1,3 +1,18 @@
+Atomicity
+
+The entire sequence of actions must be either completed or aborted. The transaction cannot be partially successful.
+
+Consistency
+
+The transaction takes the resources from one consistent state to another.
+
+Isolation
+
+A transaction's effect is not visible to other transactions until the transaction is committed.
+
+Durability 
+
+
 Oracle Database Tuning Pack
 Oracle Database Tuning Pack automates the database application tuning process,thereby significantly lowering database management costs while enhancing
 performance and reliability. Key features of Oracle Database Tuning Pack that are used in this guide include the following:
@@ -23,11 +38,7 @@ performance impact on the system. For this reason, the Oracle performance method
 ensuring that your changes improve performance.Typically, performance problems result from a lack of throughput (the amount of work that can be completed in a specified time), unacceptable user or job response time (the
 time to complete a specified workload), or both.
 
-Automatic Database Diagnostic Monitor (ADDM)implements the Oracle performance method and analyzes statistics to provide automatic diagnosis of major performance problems. Because ADDM can significantly
-shorten the time required to improve the performance of a system, it is the method used in this guide.  Automatic Workload Repository (AWR) automates database statistics Gathering Database Statistics Using the Automatic Workload Repository
-2-2 Oracle Database 2 Day + Performance Tuning Guide gathering by collecting, processing, and maintaining performance statistics for
-database problem detection and self-tuning purposes.  AWR snapshot everyhour.  It is enabled by setting STATISTICS_LEVEL to Typical.
-Ensure that the CONTROL_MANAGEMENT_PACK_ACCESS initialization parameter is set to DIAGNOSTIC+TUNING (default) or DIAGNOSTIC to enable ADDM.
+Automatic Database Diagnostic Monitor (ADDM)implements the Oracle performance method and analyzes statistics to provide automatic diagnosis of major performance problems. Because ADDM can significantly shorten the time required to improve the performance of a system, it is the method used in this guide.  Automatic Workload Repository (AWR) automates database statistics Gathering Dby collecting, processing, and maintaining performance statistics for database problem detection and self-tuning purposes.  AWR snapshot everyhour.  It is enabled by setting STATISTICS_LEVEL to Typical. Ensure that the CONTROL_MANAGEMENT_PACK_ACCESS initialization parameter is set to DIAGNOSTIC+TUNING (default) or DIAGNOSTIC to enable ADDM.  ADDM uses DB time statistics
 
 Time Model Statistics
 Time model statistics measure the time spent in the database by operation type. The most important time model statistic is database time (DB time). Database time
@@ -35,16 +46,15 @@ represents the total time spent in database calls by foreground sessions, and is
 DB time includes only time spent on client processes and does not include time spent on background processes such as PMON.
 PMON normally wakes up every 3 seconds to perform its housekeeping activities.
 
-The Active Session History (ASH) statistics are samples of session activity in the database. The database samples active sessions every second and stores them in a
-circular buffer in the System Global Area (SGA).
+The Active Session History (ASH) statistics are samples of session activity in the database. The database samples active sessions every second and stores them in a circular buffer in the System Global Area (SGA).
 
 
 High load sql - V$SQL view.
-
+V$DB_CACHE_ADVICE - Set the value of the DB_CACHE_ADVICE initialization parameter to ON.
+Allow the workload to stabilize before querying the V$DB_CACHE_ADVICE view.
 SQL_TRACE - TKPROF - Execution elapsed time (exeela).
 
-In the proactive tuning phase, you must perform tuning tasks as part of your daily database maintenance routine, such as reviewing ADDM analysis and findings,
-monitoring the real-time performance of the database, and responding to alerts.
+In the proactive tuning phase, you must perform tuning tasks as part of your daily database maintenance routine, such as reviewing ADDM analysis and findings, monitoring the real-time performance of the database, and responding to alerts.
 
 Review the ADDM findings
 Implement the ADDM recommendations
@@ -88,3 +98,25 @@ Measuring the performance before and after the change
 ■ Enabling you to implement the tuning recommendations when appropriate
 
 
+ADDM Recommendations
+
+Hardware changes
+Adding CPUs or changing the I/O subsystem configuration
+■ Database configuration - Changing initialization parameter settings
+■ Schema changes - Hash partitioning a table or index, or using automatic segment space management (ASSM)
+■ Application changes- Using the cache option for sequences or using bind variables
+■ Using other advisors - Running SQL Tuning Advisor on high-load SQL statements or running the Segment Advisor on hot objects
+
+
+DBIO_EXPECTED - 10ms - Measure the average read time of a single database block for your hardware. Typical values for hard drives are between 5000 and 20000 microseconds.
+
+The average active sessions for a time period equals the total DB time of all sessions during this period divided by the elapsed time (wall clock time) for this period
+(not clear)
+The wait classes show how much database activity is consumed by waiting for a resource such as disk I/O. Values that use a larger block of active sessions represent bottlenecks caused by a particular wait class, as indicated by the corresponding color in the legend.
+If you click CPU Used, then the Active Sessions Working page for the wait class appears. If you click a different wait class, such as User I/O, then the Active Sessions Waiting page appears.
+
+■ Click Run ADDM Now to create a snapshot manually.
+■ Click Run ASH Report to create an Active Session History (ASH) report to analyze transient, short-lived performance problems.
+
+SYS$USERS - all users
+sys$bacground
