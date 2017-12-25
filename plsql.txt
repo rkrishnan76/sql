@@ -1,0 +1,78 @@
+Associative arrays
+Nested tables
+Varray
+The collections in Oracle are strictly one dimensional. They cannot be realized on two-dimensional coordinates. However, multidimensional arrays can be realized when the collection has an object type or collection type attribute.
+
+Collections are of two types— persistent and non-persistent. A collection is persistent if it stores the collection structure and elements physically in the database. Contrarily, a non-persistent collection is active for a program only that is, maximum up to a session.
+
+Associative array (index-by table): This is the simplest form of non-persistent unbounded collections. As a non-persistent collection, it cannot be stored in the database, but they are available within a PL/SQL block only. The collection structure and data of associative array cannot be retained once the program is completed. Initially, during the days of Oracle 7, it was known as PL/SQL tables. Later, Oracle 8 version released it as index-by tables as they used an index to identify an element.
+Nested table: This is a persistent form of unbounded collections which can be created in the database as well as in PL/SQL block.
+Varray (variable-size array): This is a persistent but bounded form of collection which can be created in the database as well as in PL/SQL. Similar to a nested table, a varray is also a unidimensional homogeneous collection. The collection size and storage scheme are the factors which differentiate varrays from nested tables. Unlike a nested table, a varray can accommodate only a defined (fixed) number of elements.
+
+Selecting an appropriate collection type
+Here are a few guidelines to decide upon the appropriate usage of collection types in programs:
+
+Use of associative arrays is required when:
+
+You have to temporarily cache the program data in an array format for lookup purpose.  You need string subscripts for the collection elements. Note that it supports negative subscripts, too.
+Map hash tables from the client to the database.
+
+Use of nested tables is preferred when:
+
+You have to stores data as sets in the database. Database columns of nested table type can be declared to hold the data persistently. Perform major array operations such as insertion and deletion, on a large volume of data.
+
+Use of varrays is preferred when:
+
+You have to store calculated or predefined volume of data in the database. Varray offers limited and defined storage of rows in a collection.
+Order of the elements has to be preserved.
+
+Ordering by name and using it in where clause for filtering.
+
+SELECT * FROM test WHERE NLSSORT(name, 'NLS_SORT = XDanish') >    NLSSORT('Gaberd', 'NLS_SORT = XDanish')   ORDER BY name;
+
+Nested tables
+Nested tables are a persistent form of collections which can be created in the database as well as PL/SQL. It is an unbounded collection where the index or subscript is implicitly maintained by the Oracle server during data retrieval. Oracle automatically marks the minimum subscript as 1 and relatively handles others. As there is no upper limit defined for a nested table, its size can grow dynamically. Though not an index-value pair structure, a nested table can be accessed like an array in a PL/SQL block.
+A nested table is initially a dense collection but it might become sparse due to delete operations on the collection cells.
+
+Dense collection is the one which is tightly populated. That means, there exists no empty cells between the lower and upper indexes of the collection. Sparse collections can have empty cells between the first and the last cell of the collection. A dense collection may get sparse by performing the "delete" operations.
+
+
+A nested table definition in PL/SQL follows the following syntax:
+
+DECLARE
+TYPE type_name IS TABLE OF element_type [NOT NULL];
+In the preceding syntax, element_type is a primitive data type or a user-defined type, but not as a REF CURSOR type.
+
+In a database, a nested table can be defined using the following syntax:
+
+CREATE [OR REPLACE] TYPE type_name IS TABLE OF [element_type] [NOT NULL];
+
+USER_TYPES, user_coll_types
+The CREATE TABLE statement in the following code snippet declares a column of the NUM_NEST_T nested table type in the parent table, TAB_USE_NT_COL. The NESTED TABLE [Column] STORE AS [Storage table] clause specifies the storage table for the nested table type column. A separate table for the nested table column, NUM, ensures its out-of-line storage.
+
+SQL> CREATE TABLE TAB_USE_NT_COL (ID NUMBER, NUM NUM_NEST_T) NESTED TABLE NUM STORE AS NESTED_NUM_ID;
+http://techbus.safaribooksonline.com/book/databases/oracle-pl-sql/9781849687225/oracle-advanced-pl-sql-developer-professional-guide/id286448502?query=((Oracle+Advanced+PL%2fSQL+Developer+Professional+Guide))#X2ludGVybmFsX0h0bWxWaWV3P3htbGlkPTk3ODE4NDk2ODcyMjUlMkZpZDI4Njc2MTYyMCZxdWVyeT0oKE9yYWNsZSUyMEFkdmFuY2VkJTIwUEwlMkZTUUwlMjBEZXZlbG9wZXIlMjBQcm9mZXNzaW9uYWwlMjBHdWlkZSkp
+
+SQL> SELECT T.id, T1.column_value FROM tab_use_nt_col T, TABLE (T.num) T1;
+
+UPDATE tab_use_nt_col SET num = num_nest_t(10,12,13) WHERE id=2
+
+UPDATE TABLE (SELECT num FROM tab_use_nt_col WHERE id= 1) P SET P.COLUMN_VALUE = 100 WHERE P.COLUMN_VALUE = 12;
+
+Varray
+Varrays were introduced in Oracle8i as a modified format of a nested table. The varray or variable size arrays are bounded and the persistent form of collection whose major operational features resemble nested tables. The varray declaration defines the limit of elements a varray can accommodate. The minimum bound of the index is 1, current bound is the total number of resident elements and maximum bound is the varray size. At any moment, the current bound cannot exceed the maximum bound.
+
+Like nested tables, varrays can be created as database objects and can also be used in PL/SQL. Though the implementation is the same as a nested table, varray follow a different storage orientation than the nested tables. They are stored in line with their parent record as a raw value in the parent table. The inline storage mechanism no more needs a storage clause specification, unique identifier or separate storage table. For some exceptional situations when the varray exceeds 4 K data, Oracle follows the out-of-line storage mechanism and stores varray as an LOB.
+
+The inline storage mechanism of varrays helps Oracle to reduce the number of IOs on the disk. This makes varrays superior and more performance efficient than nested tables.
+
+http://techbus.safaribooksonline.com/book/databases/oracle-pl-sql/9781849687225/oracle-advanced-pl-sql-developer-professional-guide/id286448502?query=((Oracle+Advanced+PL%2fSQL+Developer+Professional+Guide))#X2ludGVybmFsX0h0bWxWaWV3P3htbGlkPTk3ODE4NDk2ODcyMjUlMkZpZDI4Njc2Mjc2NCZxdWVyeT0oKE9yYWNsZSUyMEFkdmFuY2VkJTIwUEwlMkZTUUwlMjBEZXZlbG9wZXIlMjBQcm9mZXNzaW9uYWwlMjBHdWlkZSkp
+
+Common collection related exceptions are as follows:
+COLLECTION_IS_NULL: This exception is raised when the collection is NULL
+NO_DATA_FOUND: This exception is raised when the element corresponding to a subscript does not exist
+SUBSCRIPT_BEYOND_COUNT: This exception is raised when the index exceeds the number of elements in the collection.
+SUBSCRIPT_OUTSIDE_LIMIT: This exception is raised when the index is not a legal value
+VALUE_ERROR: This exception is raised when an element is attempted for access without index
+
+http://techbus.safaribooksonline.com/book/databases/oracle-pl-sql/9781849687225/oracle-advanced-pl-sql-developer-professional-guide/id286448502?query=((Oracle+Advanced+PL%2fSQL+Developer+Professional+Guide))#X2ludGVybmFsX0h0bWxWaWV3P3htbGlkPTk3ODE4NDk2ODcyMjUlMkZpZDI4Njc2MzM5NSZxdWVyeT0oKE9yYWNsZSUyMEFkdmFuY2VkJTIwUEwlMkZTUUwlMjBEZXZlbG9wZXIlMjBQcm9mZXNzaW9uYWwlMjBHdWlkZSkp
