@@ -17,3 +17,16 @@ plsql package
 function
 
 procedure
+
+Views That Are Not Modifiable
+If the view query contains any of the following constructs, the view is not inherently modifiable and you therefore cannot perform inserts, updates, or deletes on the view:
+
+Set operators
+
+Aggregate functions
+
+GROUP BY, CONNECT BY, or START WITH clauses
+
+The DISTINCT operator
+
+Joins (however, some join views are updatable)
