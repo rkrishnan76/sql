@@ -30,3 +30,21 @@ GROUP BY, CONNECT BY, or START WITH clauses
 The DISTINCT operator
 
 Joins (however, some join views are updatable)
+
+USER_UPDATABLE_COLUMNS 
+
+Triggers events:
+
+System events
+
+Database startup and shutdown
+
+Data Guard role transitions
+
+Server error message events
+
+User events
+
+User logon and logoff
+
+DDL statements (CREATE, ALTER, and DROP)
