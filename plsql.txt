@@ -76,3 +76,90 @@ SUBSCRIPT_OUTSIDE_LIMIT: This exception is raised when the index is not a legal 
 VALUE_ERROR: This exception is raised when an element is attempted for access without index
 
 http://techbus.safaribooksonline.com/book/databases/oracle-pl-sql/9781849687225/oracle-advanced-pl-sql-developer-professional-guide/id286448502?query=((Oracle+Advanced+PL%2fSQL+Developer+Professional+Guide))#X2ludGVybmFsX0h0bWxWaWV3P3htbGlkPTk3ODE4NDk2ODcyMjUlMkZpZDI4Njc2MzM5NSZxdWVyeT0oKE9yYWNsZSUyMEFkdmFuY2VkJTIwUEwlMkZTUUwlMjBEZXZlbG9wZXIlMjBQcm9mZXNzaW9uYWwlMjBHdWlkZSkp
+
+Fine Grained Access Control (FGAC) also known as Virtual Private Database (VPD).
+
+GRANT CREATE ANY CONTEXT, DROP ANY CONTEXT TO ORADEV
+CREATE CONTEXT demo_context USING P_SET_CONTEXT
+SQL> CREATE OR REPLACE PROCEDURE P_SET_CONTEXT (P_VAL VARCHAR2) IS
+BEGIN
+/*Set the context using DBMS_SESSION*/
+DBMS_SESSION.SET_CONTEXT(NAMESPACE => 'DEMO_CONTEXT',
+ATTRIBUTE => 'COUNTRY',
+VALUE => P_VAL);
+
+EXEC P_SET_CONTEXT('INDIA');
+SELECT SYS_CONTEXT('DEMO_CONTEXT','COUNTRY') FROM DUAL;
+
+Policy Types:
+Static, Dynamic, Shared Static, Context Sensitive, Shared Context Sensitive.
+Predicate stored in SGA except for Shared Context Sensitive.
+Assignment 1—implementing VPD using simple security policy - DBMS_RLS package.ADD_POLICY
+Assignment 2—implementing VPD using an application context - dbms_session.set_context
+
+http://techbus.safaribooksonline.com/book/databases/oracle-pl-sql/9781849687225/oracle-advanced-pl-sql-developer-professional-guide/id286448502?query=((Oracle+Advanced+PL%2fSQL+Developer+Professional+Guide))#X2ludGVybmFsX0h0bWxWaWV3P3htbGlkPTk3ODE4NDk2ODcyMjUlMkZpZDI4Njc3MTYxMyZxdWVyeT0oKE9yYWNsZSUyMEFkdmFuY2VkJTIwUEwlMkZTUUwlMjBEZXZlbG9wZXIlMjBQcm9mZXNzaW9uYWwlMjBHdWlkZSkp
+
+USER_POLICIES
+ALL_CONTEXT
+
+ALTER SYSTEM SET PLSQL_CODE_TYPE = [NATIVE | INTERPRETED]
+
+PLSQL_OPTIMIZE_LEVEL = 1
+
+Do not declare the not null constraints.
+
+PLS_INTEGER - It is the only data type which uses native machine arithmetic instead of the C arithmetic library.
+ SIMPLE_INTEGER - default value must after the increment beyond the limit it becomes negative
+ 
+ Using SAVE_EXCEPTIONS in bulk operations.
+ 
+ SET SERVEROUTPUT ON
+/*Start the PL/SQL block*/
+DECLARE
+/*A local PL/SQL table holds the list of new names*/
+TYPE T_EMP IS TABLE OF VARCHAR2(100) ;
+L_EMP T_EMP := T_EMP('Smith','Adams',null,'King',null,'George');
+BULK_ERRORS EXCEPTION;
+
+Oracle offers two methods of inlining implementation:
+
+Oracle initialization parameter, PLSQL_OPTIMIZE_LEVEL, offers transparent optimization
+Newly introduced PRAGMA INLINE allows explicit optimization through inlining
+
+PRAGMA EXCEPTION_INIT (BULK_ERRORS, -24381);
+BEGIN
+/*FORALL to update the employee names*/
+FORALL I IN 1..L_EMP.COUNT
+SAVE EXCEPTIONS
+UPDATE EMPLOYEES
+SET ENAME = L_EMP(I);
+EXCEPTION
+/*BULK_ERRORS exception handler*/
+WHEN BULK_ERRORS THEN
+/*Display the errors occurred during BULK DML transaction*/
+FOR J IN 1..SQL%BULK_EXCEPTIONS.COUNT
+LOOP
+DBMS_OUTPUT.PUT_LINE(CHR(10));
+DBMS_OUTPUT.PUT_LINE('Error in UPDATE: '||SQL%BULK_EXCEPTIONS(J).ERROR_INDEX);
+DBMS_OUTPUT.PUT_LINE('Error Code is: '||sql%BULK_EXCEPTIONS(J).ERROR_CODE);
+DBMS_OUTPUT.PUT_LINE('Error Message is: '||sqlerrm('- '||SQL%BULK_EXCEPTIONS(J).ERROR_CODE));
+END LOOP;
+END;
+/
+Error in UPDATE: 3
+Error Code is: 1407
+Error Message is: ORA-01407: cannot update () to NULL
+Error in UPDATE: 5
+Error Code is: 1407
+Error Message is: ORA-01407: cannot update () to NULL
+PL/SQL procedure successfully completed.
+ 
+USER_PLSQL_OBJECT_SETTINGS values 0,1,2,3 - 2 best choice.  PRAGMA_INLINE
+RESULT_CACHE for plsql functions
+
+dbms_utility.format_call_Stack, 
+DBMS_UTILITY.FORMAT_ERROR_BACKTRACE
+The PL/Scope feature can be enabled by setting a system parameter called PLSCOPE_SETTINGS. By default, the feature is disabled as the parameter value is IDENTIFIERS:NONE. The valid values for the parameters are NONE for disabled and ALL for enabled parameters.
+
+
+The DBMS_METADATA package was introduced in Oracle9i. It is a metadata API which is used to extract the definitions (DDL) of schema objects. The package was introduced to get rid of DDL exports, which used to produce poorly formatted DDL scripts. It is a powerful package which can generate DDL and retrieve relevant information associated with an object in XML (by default), or textual format. The package is owned by SYS while all other users work with its public synonym.
