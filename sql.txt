@@ -1,0 +1,19 @@
+--delete duplicate records
+DELETE DEPT A WHERE A.rowiD <> (SELECT MIN(b.ROWID) FROM DEPT B WHERE A.DEPTNO=B.DEPTNO );
+
+--select the second minimum row based on dept no
+select * from dept a where 2 = (select count(b.deptno) from dept b where b.deptno <= a.deptno);
+
+--select the outer join on the table where the row is deficient
+select a.deptno, count(b.empno) from  dept a,emp b  where a.deptno = b.deptno(+) group by a.deptno
+
+--connect by prior
+select RPAD('.', (level-1)*2, '.') || ename, job, level from emp  connect by prior empno = mgr start with mgr is null;
+
+autonomous transaction
+
+plsql package
+
+function
+
+procedure
