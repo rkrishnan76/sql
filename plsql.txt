@@ -91,6 +91,77 @@ VALUE => P_VAL);
 EXEC P_SET_CONTEXT('INDIA');
 SELECT SYS_CONTEXT('DEMO_CONTEXT','COUNTRY') FROM DUAL;
 
+DBMS_TRACE Constant
+TRACE_ALL_SQL - 32
+
+ALTER [SYSTEM | SESSION] SET PLSSQL_DEBUG= [TRUE | FALSE]
+plsql_trace_runs
+plsql_trace_events
+
+Oracle introduced the PL/SQL hierarchical profiler - HPROF in Oracle 11g release 1. 
+The conventional DBMS_PROFILER tracks the performance at a lower level (individual line of programs) while DBMS_HPROF tracks the cumulative performance of a program unit.
+
+DBMS_HPROF
+
+DBMS_HPROF.START_PROFILING ('PROFILER_REP', 'F_GET_LOC.TXT');
+
+/*Connect as DBA*/
+Conn sys/system as sysdba
+Connected.
+/*Start the PL/SQL block*/
+DECLARE
+l_runid NUMBER;
+BEGIN
+/*Invoke the analyzer API*/
+l_runid := DBMS_HPROF.analyze
+(location => 'PROFILER_REP',
+FILENAME => 'F_GET_LOC.txt',
+run_comment => 'Analyzing the execution of F_GET_LOC');
+DBMS_OUTPUT.put_line('l_runid=' || l_runid);
+END;
+/
+PL/SQL procedure successfully completed
+If profiling is enabled for a session and the trace file contains a huge volume of raw profiler data, you can analyze only selected subprograms by specifying the TRACE parameter in the ANALYZE API. The following example code snippet shows the usage of the TRACE parameter in the ANALYZER subprogram. The MULTIPLE_RAW_PROFILES.txt trace file contains raw profiler data from multiple profiles. But only the profiles of F_GET_SAL and F_GET_JOB can be analyzed as follows:
+
+DECLARE
+l_runid NUMBER;
+BEGIN
+l_runid:= dbms_hprof.analyze
+( location=> 'PROFILER_REP',
+filename=> 'MULTIPLE_RAW_PROFILES.txt',
+trace => '"F_GET_SAL"."F_GET_JOB"'
+);
+end;
+/
+Query the profiling log tables
+/*Query the DBMSHP_RUNS table*/
+SELECT runid, total_elapsed_time,run_comment
+FROM dbmshp_runs
+ORDER BY runid
+/
+RUNID TOTAL_ELAPSED_TIME RUN_COMMENT
+---------- ------------------ ------------------------------------
+1 106407 Analyzing the execution of F_GET_LOC
+In the preceding query result, note that TOTAL_ELAPSED_TIME is the total execution time (in micro seconds) for the procedure. The run comment appears as per the input given during analysis.
+
+/*Query the DBMSHP_FUNCTION_INFO table*/
+SELECT runid, owner, module, type, function, namespace, function_elapsed_time,calls
+FROM dbmshp_function_info
+WHERE runid= 1
+The output of the preceding query is shown in the following screenshot:
+
+Demonstrating the profiling of a PL/SQL program
+Here, we see how the analyzer output clearly indicates the step-by-step execution profile of a PL/SQL program. It shows which engine (namespace) was employed on which call event along with the time consumed at each event.
+
+The plshprof utility
+The analyzer component simplifies much of the problem by interpreting the raw profiler data and loading it into the database tables. What more can one expect? But the services of hierarchical profiler don't end here. The correct analysis of the profiler data is as important as the interpretation of data. For this purpose, a command-line tool has been provided which can generate multiple reports in HTML format.
+
+plshprof is a command-line utility which reads the raw profiler data and generates multiple HTML reports. Each report builds up and showcases a new frame of analysis and offers better statistical foresight to the user. The sixteen reports generated can be navigated from the main report page.
+
+The plshprof utility can be executed as follows:
+
+C:\Profiler path> plshprof output [HTML FILE] [RAW PROFILER DATA]
+
 Policy Types:
 Static, Dynamic, Shared Static, Context Sensitive, Shared Context Sensitive.
 Predicate stored in SGA except for Shared Context Sensitive.
@@ -163,3 +234,10 @@ The PL/Scope feature can be enabled by setting a system parameter called PLSCOPE
 
 
 The DBMS_METADATA package was introduced in Oracle9i. It is a metadata API which is used to extract the definitions (DDL) of schema objects. The package was introduced to get rid of DDL exports, which used to produce poorly formatted DDL scripts. It is a powerful package which can generate DDL and retrieve relevant information associated with an object in XML (by default), or textual format. The package is owned by SYS while all other users work with its public synonym.
+
+
+SQL injection can be avoided by using bind variables.
+having the sql procedures defined with the current user priv instead of the person who created
+
+DBMS_SQL
+DBMS_SYS_SQL
