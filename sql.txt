@@ -49,3 +49,6 @@ User events
 User logon and logoff
 
 DDL statements (CREATE, ALTER, and DROP)
+
+DBMS_PREPROCESSOR.PRINT_POST_PROCESSED_SOURCE
+PLSQL_CCFLAGS
