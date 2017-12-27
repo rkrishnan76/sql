@@ -120,3 +120,69 @@ If you click CPU Used, then the Active Sessions Working page for the wait class 
 
 SYS$USERS - all users
 sys$bacground
+
+Partitioning for Performance (Particion pruning, Partition Wise joins), Manageability(divide and conquer) and Availability (restoring one storage of partition).
+
+Partitioning Strategies
+Oracle Partitioning offers three fundamental data distribution methods as basic partitioning strategies that control how data is placed into individual partitions:
+
+Range
+
+Hash
+
+List
+
+Using these data distribution methods, a table can either be partitioned as a single-level or as a composite-partitioned table:
+
+Single-Level Partitioning
+
+Composite Partitioning
+
+Each partitioning strategy has different advantages and design considerations. Thus, each strategy is more appropriate for a particular situation.
+
+Single-Level Partitioning
+A table is defined by specifying one of the following data distribution methodologies, using one or more columns as the partitioning key:
+
+Range Partitioning
+
+Hash Partitioning
+
+List Partitioning
+
+The types of composite partitioning are:
+
+Composite Range-Range Partitioning
+
+Composite Range-Hash Partitioning
+
+Composite Range-List Partitioning
+
+Composite List-Range Partitioning
+
+Composite List-Hash Partitioning
+
+Composite List-List Partitioning
+
+Composite Hash-Hash Partitioning
+
+Composite Hash-List Partitioning
+
+Composite Hash-Range Partitioning
+
+
+Parallel Execution of SQL Statements
+Each SQL statement undergoes an optimization and parallelization process when it is parsed. If parallel execution is executed in parallel, then the following steps occur:
+
+The user session or shadow process takes on the role of a coordinator, often called the query coordinator.
+
+The query coordinator obtains the necessary number of parallel servers.
+
+The SQL statement is executed as a sequence of operations (a full table scan to perform a join on a nonindexed column, an ORDER BY clause, and so on). The parallel execution servers performs each operation in parallel if possible.
+
+When the parallel execution servers are finished executing the statement, the query coordinator performs any portion of the work that cannot be executed in parallel. For example, a parallel query with a SUM() operation requires adding the individual subtotals calculated by each parallel server.
+
+Finally, the query coordinator returns any results to the user.
+
+After the optimizer determines the execution plan of a statement, the parallel execution coordinator determines the parallel execution method for each operation in the plan. Under normal conditions this is simply maintenance work to prepare the final result for the end user. For example, the parallel execution method might be to perform a parallel full table scan by block range or a parallel index range scan by partition. The coordinator must decide whether an operation can be performed in parallel and, if so, how many parallel execution servers to enlist. The number of parallel execution servers in one set is the degree of parallelism (DOP).
+
+
