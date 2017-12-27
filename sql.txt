@@ -6,6 +6,7 @@ select * from dept a where 2 = (select count(b.deptno) from dept b where b.deptn
 
 --select the outer join on the table where the row is deficient - left outer join
 select a.deptno, count(b.empno) from  dept a,emp b  where a.deptno = b.deptno(+) group by a.deptno
+select a.deptno, count(b.empno) from  dept a left outer join emp b  on a.deptno = b.deptno group by a.deptno
 
 --connect by prior
 select RPAD('.', (level-1)*2, '.') || ename, job, level from emp  connect by prior empno = mgr start with mgr is null;
