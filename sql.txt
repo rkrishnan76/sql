@@ -52,3 +52,36 @@ DDL statements (CREATE, ALTER, and DROP)
 
 DBMS_PREPROCESSOR.PRINT_POST_PROCESSED_SOURCE
 PLSQL_CCFLAGS
+
+isolation level:
+Read committed
+Serializable
+Read-only
+
+quiesced state -  other than SYS and SYSTEM.
+
+
+LOCK TABLE table IN ROW SHARE MODE; - least restrictive
+Permitted Operations: A row share table lock held by a transaction allows other transactions to query, insert, update, delete, or lock rows concurrently in the same table. Therefore, other transactions can obtain simultaneous row share, row exclusive, share, and share row exclusive table locks for the same table.
+
+LOCK TABLE table IN EXCLUSIVE MODE; --prevents other trx from getting the following locks
+Permitted Operations: A row exclusive table lock held by a transaction allows other transactions to query, insert, update, delete, or lock rows concurrently in the same table. Therefore, row exclusive table locks allow multiple transactions to obtain simultaneous row exclusive and row share table locks for the same table.
+LOCK TABLE table IN SHARE MODE;  
+LOCK TABLE table IN SHARE ROW EXCLUSIVE MODE; 
+LOCK TABLE table IN EXCLUSIVE MODE; 
+
+LOCK TABLE table IN SHARE MODE; --prevents other trx from getting the following locks
+Permitted Operations: A share table lock held by a transaction allows other transactions only to query the table (without using SELECT ... FOR UPDATE) or to run LOCK TABLE ... IN SHARE MODE statements successfully. No updates are allowed by other transactions. Multiple transactions can hold share table locks for the same table concurrently. In this case, no transaction can update the table. Therefore, a transaction that has a share table lock can update the table only if no other transactions also have a share table lock on the same table.
+LOCK TABLE table IN SHARE ROW EXCLUSIVE MODE; 
+LOCK TABLE table IN EXCLUSIVE MODE; 
+LOCK TABLE table IN ROW EXCLUSIVE MODE; 
+
+Share Row Exclusive Table Locks (SRX) LOCK TABLE table IN SHARE ROW EXCLUSIVE MODE; 
+Permitted Operations: Only one transaction at a time can acquire a share row exclusive table lock on a given table. A share row exclusive table lock held by a transaction allows other transactions to query the table (without using SELECT ... FOR UPDATE) but not update the table.
+LOCK TABLE table IN SHARE MODE; 
+LOCK TABLE table IN SHARE ROW EXCLUSIVE MODE; 
+LOCK TABLE table IN ROW EXCLUSIVE MODE; 
+LOCK TABLE table IN EXCLUSIVE MODE; 
+
+Exclusive Table Locks (X)
+Permitted Operations: Only one transaction can obtain an exclusive table lock for a table. An exclusive table lock permits other transactions only to query the table.
