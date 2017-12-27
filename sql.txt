@@ -4,7 +4,7 @@ DELETE DEPT A WHERE A.rowiD <> (SELECT MIN(b.ROWID) FROM DEPT B WHERE A.DEPTNO=B
 --select the second minimum row based on dept no
 select * from dept a where 2 = (select count(b.deptno) from dept b where b.deptno <= a.deptno);
 
---select the outer join on the table where the row is deficient
+--select the outer join on the table where the row is deficient - left outer join
 select a.deptno, count(b.empno) from  dept a,emp b  where a.deptno = b.deptno(+) group by a.deptno
 
 --connect by prior
